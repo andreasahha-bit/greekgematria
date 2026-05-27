@@ -1,0 +1,402 @@
+<style>
+.gem-wrap { padding: 1rem 0; font-family: var(--font-sans); }
+.gem-systems { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 8px; }
+.gem-system {
+  padding: 8px 14px;
+  font-size: 13px;
+  background: transparent;
+  border: 0.5px solid var(--color-border-tertiary);
+  border-radius: var(--border-radius-md);
+  cursor: pointer;
+  color: var(--color-text-secondary);
+  font-family: var(--font-sans);
+  transition: background 0.1s, border-color 0.1s, color 0.1s;
+}
+.gem-system:hover { background: var(--color-background-secondary); }
+.gem-system.active {
+  background: var(--color-background-secondary);
+  border-color: var(--color-border-secondary);
+  color: var(--color-text-primary);
+  font-weight: 500;
+}
+.gem-system-desc {
+  font-size: 12px;
+  color: var(--color-text-secondary);
+  margin: 0 0 1rem;
+  line-height: 1.5;
+  min-height: 18px;
+}
+.gem-row { display: flex; gap: 8px; align-items: flex-start; }
+.gem-input {
+  flex: 1;
+  font-size: 18px;
+  padding: 12px 14px;
+  box-sizing: border-box;
+  font-family: var(--font-sans);
+  min-width: 0;
+  resize: vertical;
+  min-height: 64px;
+  line-height: 1.5;
+}
+.gem-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin: 1rem 0;
+}
+.gem-stat {
+  background: var(--color-background-secondary);
+  border-radius: var(--border-radius-md);
+  padding: 1rem 1.25rem;
+}
+.gem-stat-label { font-size: 13px; color: var(--color-text-secondary); margin-bottom: 6px; }
+.gem-stat-value { font-size: 28px; font-weight: 500; color: var(--color-text-primary); line-height: 1; }
+.gem-stat-hint { font-size: 11px; color: var(--color-text-tertiary); margin-top: 6px; }
+.gem-keyboard {
+  display: grid;
+  grid-template-columns: repeat(9, 1fr);
+  gap: 6px;
+  margin: 1rem 0;
+}
+.gem-key {
+  padding: 10px 0;
+  background: var(--color-background-primary);
+  border: 0.5px solid var(--color-border-tertiary);
+  border-radius: var(--border-radius-md);
+  cursor: pointer;
+  font-family: var(--font-sans);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  transition: background 0.1s;
+}
+.gem-key:hover { background: var(--color-background-secondary); }
+.gem-key:active { transform: scale(0.97); }
+.gem-key-archaic { background: var(--color-background-secondary); }
+.gem-key-letter { font-size: 18px; font-weight: 500; color: var(--color-text-primary); }
+.gem-key-value { font-size: 10px; color: var(--color-text-tertiary); }
+.gem-breakdown-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 8px;
+}
+.gem-breakdown-legend { font-size: 11px; color: var(--color-text-tertiary); }
+.gem-breakdown { margin: 0 0 1.5rem; min-height: 56px; }
+.gem-word {
+  padding: 14px 0;
+  border-top: 0.5px solid var(--color-border-tertiary);
+}
+.gem-word:first-child { border-top: none; padding-top: 0; }
+.gem-word-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 10px;
+  gap: 12px;
+}
+.gem-word-text {
+  font-size: 18px;
+  font-weight: 500;
+  color: var(--color-text-primary);
+  word-break: break-word;
+}
+.gem-word-sums {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.gem-word-sum {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-text-primary);
+  background: var(--color-background-secondary);
+  padding: 3px 12px;
+  border-radius: var(--border-radius-md);
+  font-variant-numeric: tabular-nums;
+}
+.gem-word-arrow { font-size: 12px; color: var(--color-text-tertiary); }
+.gem-word-root {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-text-secondary);
+  padding: 3px 10px;
+  border-radius: var(--border-radius-md);
+  border: 0.5px solid var(--color-border-tertiary);
+  font-variant-numeric: tabular-nums;
+  min-width: 16px;
+  text-align: center;
+}
+.gem-word-letters { display: flex; flex-wrap: wrap; gap: 6px; }
+.gem-letter-box {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 6px 10px;
+  background: var(--color-background-primary);
+  border: 0.5px solid var(--color-border-tertiary);
+  border-radius: var(--border-radius-md);
+  min-width: 28px;
+  gap: 2px;
+}
+.gem-letter { font-size: 16px; font-weight: 500; color: var(--color-text-primary); }
+.gem-value { font-size: 10px; color: var(--color-text-secondary); }
+.gem-section-label { font-size: 12px; color: var(--color-text-secondary); margin: 0 0 8px; }
+.gem-examples { display: flex; flex-wrap: wrap; gap: 6px; }
+.gem-example { font-size: 13px; padding: 6px 12px; font-family: var(--font-sans); cursor: pointer; }
+.gem-empty { color: var(--color-text-tertiary); font-size: 14px; padding: 14px 0; display: block; }
+</style>
+
+<h2 class="sr-only">Greek gematria calculator. Type or paste Greek text. Each word gets its own gematria value and final sum (digital root); the whole sentence is also totalled. Four numbering systems can be switched at the top.</h2>
+
+<div class="gem-wrap">
+  <p class="gem-section-label">Numbering system</p>
+  <div class="gem-systems" id="gem-systems">
+    <button type="button" class="gem-system active" data-system="standard">Standard</button>
+    <button type="button" class="gem-system" data-system="reduced">Reduced</button>
+    <button type="button" class="gem-system" data-system="ordinal">Ordinal</button>
+    <button type="button" class="gem-system" data-system="reverse">Reverse</button>
+  </div>
+  <p class="gem-system-desc" id="gem-system-desc"></p>
+
+  <div class="gem-row">
+    <textarea id="gem-input" class="gem-input" rows="2" placeholder="Type or paste Greek text — single words or full sentences…" autocomplete="off" spellcheck="false"></textarea>
+    <button id="gem-clear" type="button"><i class="ti ti-x" aria-hidden="true" style="font-size:14px; vertical-align:-2px; margin-right:4px"></i>Clear</button>
+  </div>
+
+  <div class="gem-stats">
+    <div class="gem-stat">
+      <div class="gem-stat-label">Sentence total</div>
+      <div class="gem-stat-value" id="gem-total">0</div>
+      <div class="gem-stat-hint" id="gem-total-hint">Sum of all words</div>
+    </div>
+    <div class="gem-stat">
+      <div class="gem-stat-label">Final sum</div>
+      <div class="gem-stat-value" id="gem-root">0</div>
+      <div class="gem-stat-hint" id="gem-root-trace">Digital root (single digit)</div>
+    </div>
+  </div>
+
+  <div class="gem-breakdown-head">
+    <span class="gem-section-label" style="margin:0">Word breakdown</span>
+    <span class="gem-breakdown-legend">value → final sum</span>
+  </div>
+  <div class="gem-breakdown" id="gem-breakdown">
+    <span class="gem-empty">Words and their sums appear here</span>
+  </div>
+
+  <p class="gem-section-label">Greek keyboard (archaic letters shaded)</p>
+  <div class="gem-keyboard" id="gem-keyboard"></div>
+
+  <p class="gem-section-label">Try an example</p>
+  <div class="gem-examples">
+    <button class="gem-example" type="button" data-text="ἀγάπη">ἀγάπη (love)</button>
+    <button class="gem-example" type="button" data-text="σοφία">σοφία (wisdom)</button>
+    <button class="gem-example" type="button" data-text="Ἰησοῦς">Ἰησοῦς (Jesus)</button>
+    <button class="gem-example" type="button" data-text="γνῶθι σεαυτόν">γνῶθι σεαυτόν (know thyself)</button>
+    <button class="gem-example" type="button" data-text="πάντα ῥεῖ">πάντα ῥεῖ (all flows)</button>
+    <button class="gem-example" type="button" data-text="ἐν ἀρχῇ ἦν ὁ λόγος">ἐν ἀρχῇ ἦν ὁ λόγος (John 1:1)</button>
+    <button class="gem-example" type="button" data-text="οἶδα ὅτι οὐδὲν οἶδα">οἶδα ὅτι οὐδὲν οἶδα (Socrates)</button>
+  </div>
+</div>
+
+<script>
+(function() {
+  const systems = {
+    standard: {
+      name: 'Standard',
+      description: 'Classical isopsephy. Three tiers of nine: units (1–9), tens (10–90), hundreds (100–900).',
+      hint: 'Sum of letter values',
+      values: {
+        'α':1,'β':2,'γ':3,'δ':4,'ε':5,'ϛ':6,'ζ':7,'η':8,'θ':9,
+        'ι':10,'κ':20,'λ':30,'μ':40,'ν':50,'ξ':60,'ο':70,'π':80,'ϟ':90,
+        'ρ':100,'σ':200,'ς':200,'τ':300,'υ':400,'φ':500,'χ':600,'ψ':700,'ω':800,'ϡ':900
+      }
+    },
+    reduced: {
+      name: 'Reduced',
+      description: 'Pythmenes — each letter collapsed to its single-digit form. α, ι, ρ all give 1; β, κ, σ all give 2; and so on.',
+      hint: 'Sum of reduced values (1–9 per letter)',
+      values: {
+        'α':1,'β':2,'γ':3,'δ':4,'ε':5,'ϛ':6,'ζ':7,'η':8,'θ':9,
+        'ι':1,'κ':2,'λ':3,'μ':4,'ν':5,'ξ':6,'ο':7,'π':8,'ϟ':9,
+        'ρ':1,'σ':2,'ς':2,'τ':3,'υ':4,'φ':5,'χ':6,'ψ':7,'ω':8,'ϡ':9
+      }
+    },
+    ordinal: {
+      name: 'Ordinal',
+      description: 'Position in the 27-letter alphabet, archaic letters included in their numeric slots.',
+      hint: 'Sum of alphabet positions (1–27)',
+      values: {
+        'α':1,'β':2,'γ':3,'δ':4,'ε':5,'ϛ':6,'ζ':7,'η':8,'θ':9,
+        'ι':10,'κ':11,'λ':12,'μ':13,'ν':14,'ξ':15,'ο':16,'π':17,'ϟ':18,
+        'ρ':19,'σ':20,'ς':20,'τ':21,'υ':22,'φ':23,'χ':24,'ψ':25,'ω':26,'ϡ':27
+      }
+    },
+    reverse: {
+      name: 'Reverse',
+      description: 'Atbash mirror — α ↔ ϡ, β ↔ ω, γ ↔ ψ, with ν staying at 50 as the pivot.',
+      hint: 'Sum of mirrored standard values',
+      values: {
+        'α':900,'β':800,'γ':700,'δ':600,'ε':500,'ϛ':400,'ζ':300,'η':200,'θ':100,
+        'ι':90,'κ':80,'λ':70,'μ':60,'ν':50,'ξ':40,'ο':30,'π':20,'ϟ':10,
+        'ρ':9,'σ':8,'ς':8,'τ':7,'υ':6,'φ':5,'χ':4,'ψ':3,'ω':2,'ϡ':1
+      }
+    }
+  };
+
+  const keyboardOrder = [
+    ['α',false],['β',false],['γ',false],['δ',false],['ε',false],['ϛ',true],['ζ',false],['η',false],['θ',false],
+    ['ι',false],['κ',false],['λ',false],['μ',false],['ν',false],['ξ',false],['ο',false],['π',false],['ϟ',true],
+    ['ρ',false],['σ',false],['τ',false],['υ',false],['φ',false],['χ',false],['ψ',false],['ω',false],['ϡ',true]
+  ];
+
+  let currentSystem = 'standard';
+
+  function normalize(ch) {
+    return ch.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+  }
+
+  function escapeHtml(s) {
+    return s.replace(/[&<>"']/g, function(c) {
+      return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c];
+    });
+  }
+
+  function gemWord(text) {
+    const values = systems[currentSystem].values;
+    let total = 0;
+    const breakdown = [];
+    for (const ch of text) {
+      const norm = normalize(ch);
+      if (values[norm] !== undefined) {
+        total += values[norm];
+        breakdown.push({ letter: ch, value: values[norm] });
+      }
+    }
+    return { total: total, breakdown: breakdown };
+  }
+
+  function parseSentence(text) {
+    const tokens = text.split(/\s+/).filter(function(t) { return t.length > 0; });
+    const words = [];
+    let total = 0;
+    for (const t of tokens) {
+      const r = gemWord(t);
+      words.push({ word: t, total: r.total, breakdown: r.breakdown });
+      total += r.total;
+    }
+    return { words: words, total: total };
+  }
+
+  function digitalRoot(n) {
+    const steps = [n];
+    while (n >= 10) {
+      n = String(n).split('').reduce(function(a, b) { return a + Number(b); }, 0);
+      steps.push(n);
+    }
+    return { value: n, steps: steps };
+  }
+
+  const input = document.getElementById('gem-input');
+  const totalEl = document.getElementById('gem-total');
+  const totalHintEl = document.getElementById('gem-total-hint');
+  const rootEl = document.getElementById('gem-root');
+  const rootTraceEl = document.getElementById('gem-root-trace');
+  const breakdownEl = document.getElementById('gem-breakdown');
+  const keyboardEl = document.getElementById('gem-keyboard');
+  const systemsEl = document.getElementById('gem-systems');
+  const systemDescEl = document.getElementById('gem-system-desc');
+
+  function renderKeyboard() {
+    const values = systems[currentSystem].values;
+    keyboardEl.innerHTML = keyboardOrder.map(function(k) {
+      const cls = k[1] ? 'gem-key gem-key-archaic' : 'gem-key';
+      return '<button type="button" class="' + cls + '" data-letter="' + k[0] + '"><span class="gem-key-letter">' + k[0] + '</span><span class="gem-key-value">' + values[k[0]] + '</span></button>';
+    }).join('');
+  }
+
+  function render() {
+    totalHintEl.textContent = systems[currentSystem].hint;
+    const r = parseSentence(input.value);
+    totalEl.textContent = r.total.toLocaleString();
+
+    const dr = digitalRoot(r.total);
+    rootEl.textContent = dr.value;
+    if (dr.steps.length > 1) {
+      rootTraceEl.textContent = dr.steps.join(' → ');
+    } else {
+      rootTraceEl.textContent = 'Digital root (single digit)';
+    }
+
+    if (r.words.length === 0) {
+      breakdownEl.innerHTML = '<span class="gem-empty">Words and their sums appear here</span>';
+    } else {
+      breakdownEl.innerHTML = r.words.map(function(w) {
+        const letters = w.breakdown.map(function(b) {
+          return '<div class="gem-letter-box"><span class="gem-letter">' + escapeHtml(b.letter) + '</span><span class="gem-value">' + b.value + '</span></div>';
+        }).join('');
+        const lettersBlock = w.breakdown.length === 0
+          ? '<span class="gem-empty" style="padding:0">No Greek letters in this word</span>'
+          : '<div class="gem-word-letters">' + letters + '</div>';
+        const wordRoot = digitalRoot(w.total).value;
+        const sumsBlock = w.breakdown.length === 0
+          ? ''
+          : '<div class="gem-word-sums">' +
+              '<span class="gem-word-sum">' + w.total.toLocaleString() + '</span>' +
+              '<span class="gem-word-arrow">→</span>' +
+              '<span class="gem-word-root">' + wordRoot + '</span>' +
+            '</div>';
+        return '<div class="gem-word">' +
+          '<div class="gem-word-header"><span class="gem-word-text">' + escapeHtml(w.word) + '</span>' + sumsBlock + '</div>' +
+          lettersBlock +
+        '</div>';
+      }).join('');
+    }
+  }
+
+  function setSystem(name) {
+    if (!systems[name]) return;
+    currentSystem = name;
+    systemDescEl.textContent = systems[name].description;
+    systemsEl.querySelectorAll('.gem-system').forEach(function(b) {
+      b.classList.toggle('active', b.dataset.system === name);
+    });
+    renderKeyboard();
+    render();
+  }
+
+  systemsEl.addEventListener('click', function(e) {
+    const btn = e.target.closest('.gem-system');
+    if (btn) setSystem(btn.dataset.system);
+  });
+
+  keyboardEl.addEventListener('click', function(e) {
+    const btn = e.target.closest('.gem-key');
+    if (btn) {
+      input.value += btn.dataset.letter;
+      input.focus();
+      render();
+    }
+  });
+
+  document.getElementById('gem-clear').addEventListener('click', function() {
+    input.value = '';
+    input.focus();
+    render();
+  });
+
+  document.querySelectorAll('.gem-example').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      input.value = btn.dataset.text;
+      render();
+    });
+  });
+
+  input.addEventListener('input', render);
+  setSystem('standard');
+})();
+</script>
